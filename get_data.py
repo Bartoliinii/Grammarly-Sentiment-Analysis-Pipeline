@@ -8,16 +8,16 @@ def get_args():
     ap.add_argument("-a","--ammount",type=int,required=True,help="Ammount of reviews")
     return vars(ap.parse_args())
 
-def google_play(country: str = 'us', ammount: int = 1000):
+def google_play(country: str = 'us', ammount: int = 1000, max_score: int = 3):
 
     if len(country) != 2:
         raise ValueError("Country index contains only 2 characters")
-
+    max_score += 1
     ammount = abs(int(ammount/5))
     
     text_reviews = []
-    print("------running printing algorithm------")
-    for i in range(1,6):
+    print("------running scraping algorithm------")
+    for i in range(1,max_score):
         result,_ = reviews(
         'com.grammarly.android.keyboard',
         lang='en',
@@ -32,16 +32,10 @@ def google_play(country: str = 'us', ammount: int = 1000):
 
 
 
-def main(args):
+def scrape_data(country: str, ammount: int, max_score: int):
     print("------recieved data------")
-    country = args["country"]
-    ammount = args["ammount"]
 
-    reviews = google_play(country, ammount)
+    reviews = google_play(country, ammount, max_score)
 
-    df = pd.DataFrame(reviews, columns=["user_name","review","thumbs_up_count"]).sort_values(by="thumbs_up_count",ascending=False)
-    print(df)
-
-if __name__=="__main__":
-    args = get_args()
-    main(args)
+    df = pd.DataFrame(reviews, columns=["user_name","review","thumbs_up_count"])
+    return df
