@@ -13,11 +13,11 @@ def google_play(country: str = 'us', ammount: int = 1000):
     if len(country) != 2:
         raise ValueError("Country index contains only 2 characters")
 
-    ammount = abs(int(ammount/3))
+    ammount = abs(int(ammount/5))
     
     text_reviews = []
     print("------running printing algorithm------")
-    for i in range(1,4):
+    for i in range(1,6):
         result,_ = reviews(
         'com.grammarly.android.keyboard',
         lang='en',
