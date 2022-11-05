@@ -26,7 +26,7 @@ def google_play(country: str = 'us', ammount: int = 1000, max_score: int = 3):
         count=ammount,
         filter_score_with=i
         )    
-        [text_reviews.append((review["userName"],review["content"],review["thumbsUpCount"])) for review in result]
+        [text_reviews.append((review["userName"],review["content"],review["thumbsUpCount"],i)) for review in result]
 
     return text_reviews
 
@@ -37,5 +37,5 @@ def scrape_data(country: str, ammount: int, max_score: int):
 
     reviews = google_play(country, ammount, max_score)
 
-    df = pd.DataFrame(reviews, columns=["user_name","review","thumbs_up_count"])
+    df = pd.DataFrame(reviews, columns=["user_name","review","thumbs_up_count","raiting"])
     return df
