@@ -30,8 +30,6 @@ def google_play(country: str = 'us', ammount: int = 1000, max_score: int = 3):
 
     return text_reviews
 
-
-
 def scrape_data(country: str, ammount: int, max_score: int):
     print("------recieved data------")
 
