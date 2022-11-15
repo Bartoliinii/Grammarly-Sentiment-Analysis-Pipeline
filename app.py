@@ -1,23 +1,45 @@
+from operator import index
 import streamlit as st
+import plotly.express as px
+from pycaret.regression import setup, compare_models, pull, save_model, load_model
+import pandas_profiling
 import pandas as pd
-import numpy as np
+from streamlit_pandas_profiling import st_profile_report
+import os 
 
-st.title('Grammarly reviews analysis')
-DATE_COLUMN = 'date/time'
+if os.path.exists('./dataset.csv'): 
+    df = pd.read_csv('dataset.csv', index_col=None)
 
-DATA_URL = ('https://s3-us-west-2.amazonaws.com/'
-         'streamlit-demo-data/uber-raw-data-sep14.csv.gz')
+with st.sidebar: 
+    st.image("favpng_future-ico.png")
+    st.title("AutoNickML")
+    choice = st.radio("Navigation", ["Upload","Profiling","Modelling", "Download"])
+    st.info("This project application helps you build and explore your data.")
 
-def load_data(nrows):
-    data = pd.read_csv(DATA_URL, nrows=nrows)
-    lowercase = lambda x: str(x).lower()
-    data.rename(lowercase, axis='columns', inplace=True)
-    data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
-    return data
+if choice == "Upload":
+    st.title("Upload Your Dataset")
+    file = st.file_uploader("Upload Your Dataset")
+    if file: 
+        df = pd.read_csv(file, index_col=None)
+        df.to_csv('dataset.csv', index=None)
+        st.dataframe(df)
 
-# Create a text element and let the reader know the data is loading.
-data_load_state = st.text('Loading data...')
-# Load 10,000 rows of data into the dataframe.
-data = load_data(10000)
-# Notify the reader that the data was successfully loaded.
-data_load_state.text('Loading data...done!')
+if choice == "Profiling": 
+    st.title("Exploratory Data Analysis")
+    profile_df = df.profile_report()
+    st_profile_report(profile_df)
+
+if choice == "Modelling": 
+    chosen_target = st.selectbox('Choose the Target Column', df.columns)
+    if st.button('Run Modelling'): 
+        setup(df, target=chosen_target, silent=True)
+        setup_df = pull()
+        st.dataframe(setup_df)
+        best_model = compare_models()
+        compare_df = pull()
+        st.dataframe(compare_df)
+        save_model(best_model, 'best_model')
+
+if choice == "Download": 
+    with open('best_model.pkl', 'rb') as f: 
+        st.download_button('Download Model', f, file_name="best_model.pkl")
